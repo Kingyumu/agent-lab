@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Env & secrets
+.env
+*.pem
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Data / runtime
+data/
+*.db
+*.sqlite3
+.checkpoints/
+.chroma/
+logs/
+.tmp/
+
+# OS
+.DS_Store
+Thumbs.db
