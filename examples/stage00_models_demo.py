@@ -1,4 +1,10 @@
-"""阶段 0：Pydantic 模型演示。"""
+"""阶段 0：Pydantic 模型演示。
+
+【Python 语法速览】（边学 Agent 边学 Python）
+- `try/except`：捕获指定异常，避免程序直接崩溃
+- 关键字参数 `name=值`：按名字传参，顺序可变
+- 枚举成员如 `RunStatus.succeeded`：用点号取「具名常量」
+"""
 
 from __future__ import annotations
 
@@ -12,6 +18,7 @@ def main() -> None:
     print("请求 OK:", req.model_dump())
 
     resp = AgentResponse(session_id=req.session_id, reply="2", status=RunStatus.succeeded)
+    # [Python] `mode="json"`：把枚举/日期等转成 JSON 友好类型
     print("响应 OK:", resp.model_dump(mode="json"))
 
     req2 = AgentRequest(message="你好", session_id='demo')
@@ -26,6 +33,7 @@ def main() -> None:
 
     try:
         AgentRequest(session_id="s1", message="   ")
+    # [Python] `except 类型 as e`：捕获异常并绑定到变量 `e`
     except ValidationError as e:
         print("空消息会被拒绝：")
         print(e)

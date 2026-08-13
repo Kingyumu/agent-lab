@@ -1,4 +1,10 @@
-"""阶段 6：Plan-and-Execute 演示。"""
+"""阶段 6：Plan-and-Execute 演示。
+
+【Python 语法速览】（边学 Agent 边学 Python）
+- `json.dumps(dict)`：把 Python 字典编码成 JSON 字符串
+- 列表字面量可含多个对象：这里是按顺序的「假 LLM 剧本」
+- `if/else` 分支：mock 与真实客户端二选一构造
+"""
 
 from __future__ import annotations
 
@@ -15,6 +21,7 @@ async def main(mock: bool) -> None:
         client = MockLLMClient(
             script=[
                 ChatResult(
+                    # [Python] `json.dumps`：dict → JSON 文本；`ensure_ascii=False` 保留中文
                     content=json.dumps(
                         {
                             "goal": "写一份 Agent 学习周报",

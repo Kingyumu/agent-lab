@@ -1,4 +1,11 @@
-"""Plan-and-Execute 最小实现。"""
+"""Plan-and-Execute 最小实现。
+
+【Python 语法速览】（边学 Agent 边学 Python）
+- `@dataclass`：自动生成 `__init__` 等样板代码，适合内部结果对象
+- Pydantic `BaseModel`：要校验/结构化输出时用；和 dataclass 各司其职
+- `field(default_factory=list)`：可变默认列表每次新建
+- `async for`/循环里 `await`：顺序执行多步异步任务
+"""
 
 from __future__ import annotations
 
@@ -17,6 +24,7 @@ class PlanStep(BaseModel):
 
 class Plan(BaseModel):
     goal: str
+    # [Python] Field(min_length/max_length)：对 list 限制元素个数，不是字符串长度
     steps: list[PlanStep] = Field(min_length=1, max_length=8)
 
 
@@ -30,6 +38,7 @@ class StepResult:
 @dataclass
 class PlanExecuteResult:
     plan: Plan
+    # [Python] default_factory=list：每个实例自己的空 list，不会共享
     step_results: list[StepResult] = field(default_factory=list)
     final: str = ""
 
@@ -62,12 +71,15 @@ class PlanExecuteAgent:
             ]
         )
         text = result.content or ""
+        # [Python] bool(text.strip())：去掉空白后非空则 True
         return StepResult(step_id=step.id, ok=bool(text.strip()), output=text)
 
     async def run(self, goal: str) -> PlanExecuteResult:
         plan = await self.plan(goal)
         results: list[StepResult] = []
         for step in plan.steps:
+            # [Python] 循环内 await：一步完成再下一步（串行，不是并发）
             results.append(await self.execute_step(step))
+        # [Python] 生成器表达式喂给 join：只拼 ok 的输出
         final = "；".join(r.output for r in results if r.ok)
         return PlanExecuteResult(plan=plan, step_results=results, final=final)

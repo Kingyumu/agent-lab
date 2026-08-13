@@ -1,4 +1,10 @@
-"""阶段 2：结构化输出演示。"""
+"""阶段 2：结构化输出演示。
+
+【Python 语法速览】（边学 Agent 边学 Python）
+- `class X(BaseModel)`：继承；子类自动获得父类能力
+- `字段: 类型 = 默认值`：声明属性类型与缺省
+- 括号内隐式字符串拼接：相邻字面量会自动连成一条长字符串
+"""
 
 from __future__ import annotations
 
@@ -20,10 +26,12 @@ class PlanStep(BaseModel):
 
 class TaskPlan(BaseModel):
     goal: str
+    # [Python] `Field(...)`：给字段加校验约束（最小/最大长度等）
     steps: list[PlanStep] = Field(min_length=2, max_length=6)
 
 
 async def main(mock: bool) -> None:
+    # [Python] `Path(...).read_text(...)`：按路径读整个文本文件
     system = Path("prompts/task_decomposer.txt").read_text(encoding="utf-8")
     user = "我想系统学习 Python AI Agent，请拆解成可执行步骤。"
 
@@ -31,6 +39,7 @@ async def main(mock: bool) -> None:
         client = MockLLMClient(
             script=[
                 ChatResult(
+                    # [Python] 括号内多个相邻字符串字面量会自动拼接
                     content=(
                         '{"goal":"学习 Python AI Agent",'
                         '"steps":['
@@ -52,6 +61,7 @@ async def main(mock: bool) -> None:
         user=user,
         model_type=TaskPlan,
     )
+    # [Python] 关键字参数可跨行，末尾逗号合法，方便增删
     print(plan.model_dump_json(indent=2, ensure_ascii=False))
 
 

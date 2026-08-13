@@ -1,4 +1,10 @@
-"""最小评测运行器。"""
+"""最小评测运行器。
+
+【Python 语法速览】（边学 Agent 边学 Python）
+- `list[dict]` / `dict[str, tuple[...]]`：内置泛型注解，描述容器元素类型
+- `A | None`：联合类型，表示「A 或者 None」（Python 3.10+）
+- `Path(__file__).parent`：以当前文件为锚点拼相对路径，换目录运行也稳
+"""
 
 from __future__ import annotations
 
@@ -11,6 +17,7 @@ def load_cases(path: Path) -> list[dict]:
     for line in path.read_text(encoding="utf-8").splitlines():
         line = line.strip()
         if line:
+            # [Python] `json.loads`：JSON 文本 → Python 对象（这里是 dict）
             cases.append(json.loads(line))
     return cases
 
@@ -18,6 +25,7 @@ def load_cases(path: Path) -> list[dict]:
 def grade(case: dict, output: str, tools_used: list[str] | None = None) -> dict:
     reasons = []
     ok = True
+    # [Python] `or []`：左边为 None/空时回落到空列表，避免迭代 None
     for token in case.get("expect_contains") or []:
         if token not in output:
             ok = False
@@ -41,12 +49,15 @@ def demo_outputs() -> dict[str, tuple[str, list[str]]]:
 
 
 def main() -> None:
+    # [Python] `__file__` 是本文件路径；`.parent` 取其目录
     cases = load_cases(Path(__file__).parent / "datasets" / "smoke.jsonl")
     outputs = demo_outputs()
     rows = []
     for case in cases:
+        # [Python] 元组解包：`get` 得到 `(out, tools)`，一次拆成两个变量
         out, tools = outputs.get(case["id"], ("", []))
         rows.append(grade(case, out, tools))
+    # [Python] 生成器表达式放进 `sum`：统计 ok 为真的条数
     passed = sum(1 for r in rows if r["ok"])
     print(json.dumps({"passed": passed, "total": len(rows), "rows": rows}, ensure_ascii=False, indent=2))
 

@@ -1,4 +1,11 @@
-"""手写 Tool Agent 主循环。"""
+"""手写 Tool Agent 主循环。
+
+【Python 语法速览】（边学 Agent 边学 Python）
+- `@dataclass`：自动生成 `__init__` / `__repr__` 等样板代码
+- `field(default_factory=list)`：可变默认值的正确写法
+- 切片 `text[:n]`：取前 n 个字符；负数索引从末尾算
+- 三元表达式 `a if cond else b`：单行条件取值
+"""
 
 from __future__ import annotations
 
@@ -26,6 +33,7 @@ class AgentRunResult:
 
 
 def _truncate(text: str, limit: int = 4000) -> str:
+    # [Python] 前缀 `_`：约定「模块内私有」，不鼓励外部依赖
     if len(text) <= limit:
         return text
     return text[: limit - 20] + "\n...[truncated]..."
@@ -45,6 +53,7 @@ class AgentLoop:
         self.max_steps = max_steps
         if system_prompt is None:
             path = Path("prompts/react_agent.txt")
+            # [Python] 多行三元：条件成立取 read_text，否则用默认字符串
             system_prompt = (
                 path.read_text(encoding="utf-8")
                 if path.exists()
@@ -77,7 +86,9 @@ class AgentLoop:
             )
             observations: list[str] = []
             for call in result.tool_calls:
+                # [Python] `dict["a"]["b"]`：嵌套键访问；缺键会 KeyError
                 name = call["function"]["name"]
+                # [Python] `x or "{}"`：空字符串/None 时用默认 JSON 对象
                 args = call["function"].get("arguments") or "{}"
                 obs = await self.registry.execute(name, args)
                 obs = _truncate(obs)
@@ -86,6 +97,7 @@ class AgentLoop:
                     ChatMessage(
                         role="tool",
                         content=obs,
+                        # [Python] `.get("id")`：键不存在返回 None，不抛异常
                         tool_call_id=call.get("id"),
                         name=name,
                     )
